@@ -17,6 +17,8 @@ function Add-Package {
         try {
             Set-GAGroup start
             $currentDirectory = (Get-Location).Path
+            Write-Host "Build Directory: $($Config.build_directory)"
+            Write-Host "Current Directory: $currentDirectory"
             New-Item -Path $currentDirectory\artifacts -ItemType Directory -Force | Out-Null
             $docsFiles = @("LICENSE", "COPYRIGHT", "COPYING")
             $docsFiles | ForEach-Object {
@@ -40,6 +42,7 @@ function Add-Package {
                 }
             }
             Get-ChildItem -Path $Config.build_directory -Recurse -Filter "*.dll" | ForEach-Object {
+                Write-Host "Copying $($_.FullName) to artifacts..."
                 Copy-Item -Path $_.FullName -Destination artifacts -Force
             }
             Get-ChildItem -Path "artifacts\*.dll" | ForEach-Object {
@@ -87,6 +90,7 @@ function Add-Package {
 
             # As per https://github.com/ThePHPF/pie-design#windows-binaries
             $arch = $Config.arch
+            Write-Host "Testing php_$($Config.name).dll..."
             if(-not(Test-Path -Path "php_$($Config.name).dll")) {
                 throw "Failed to build extension"
             }
